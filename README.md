@@ -2,6 +2,9 @@
 A module help you make sync calling chain on Promise.
 Talk is cheap, show you the code.
 
+# Note
+This module only can run in Node 6.x because it use `Proxy`.
+
 # Usage
 ## Get and Apply
 You can use it like:
@@ -51,7 +54,4 @@ var _ = require('promixy').setDefault({
 ##methods
 If you use some module like `bluebird` that provide many method to Promise, you can choose what method can use on promixy.
 ##Promise
-And you can define the what Promise Library that promixy use.
-
-# Note
-This module only can run in Node 6.x because it use `Proxy`.
+You can define what Promise Library that promixy use.
