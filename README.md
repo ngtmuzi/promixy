@@ -20,8 +20,8 @@ _({a: 12333})
 ```
 If you want get the origin promise object just use `a.__promise`,
 if you want get the calling chain just use `a.__chainPath`,
-otherwise promixy object always return a Proxy with Promise,
-so you must attention if you want get the value of Promise you must use `.then`.
+otherwise promixy object always return a `Proxy` with `Promise`,
+so must attention if you want get the value of `Promise`, you always must use `.then`.
 
 ## Set
 
