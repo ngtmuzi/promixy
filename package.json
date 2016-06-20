@@ -1,0 +1,26 @@
+{
+  "name": "promixy",
+  "version": "1.0.0",
+  "description": "A module help you make sync calling chain on Promise.",
+  "main": "index.js",
+  "engines": {
+    "node":">=6.0.0"
+  },
+  "scripts": {
+    "test": "node ./test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngtmuzi/promixy.git"
+  },
+  "keywords": [
+    "Proxy",
+    "Promise"
+  ],
+  "author": "ngtmuzi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ngtmuzi/promixy/issues"
+  },
+  "homepage": "https://github.com/ngtmuzi/promixy#readme"
+}
