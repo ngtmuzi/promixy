@@ -15,6 +15,7 @@ function makePromixy(opts = {}) {
 
   const handler = {
     get(getter, prop, receiver){
+
       let {targetP, path} = getter();
 
       if (prop === '__chainPath') return path;
@@ -24,7 +25,7 @@ function makePromixy(opts = {}) {
       if (promiseMethods.includes(prop) && targetP[prop]) {
         return new Proxy(setter(
           Promise.resolve(targetP[prop].bind(targetP)),
-          `${path}.[Promise]${prop}`
+          `${path}.[Promise: ${prop}]`
         ), handler);
       }
 
@@ -59,16 +60,25 @@ function makePromixy(opts = {}) {
         targetP.then(function (target) {
           if (target == null || typeof target !== 'function')
             throw new TypeError(`${path} is not function, got a ${typeof target}: ${target}`);
+          
+          //try use origin promise
+          argList = argList.map(a=> a.__promise || a);
 
-          return Promise.resolve(Reflect.apply(target, null, argList))
-            .catch(function (err) {
-              //add the call chain path
-              if (err.stack && !err.__alreadyCatch) {
-                err.stack = `${err.stack}\n\tPromixy chain: ${path}`;
-                Object.defineProperty(err, '__alreadyCatch', {value: true});
+          //try to calculate the promise value 
+          return Promise.all(argList)
+            .then(function (argList) {
+              try {
+                return Reflect.apply(target, thisArg, argList);
+              } catch (err) {
+                //add the call chain path
+                if (err.stack && !err.__alreadyCatch) {
+                  err.stack = `${err.stack}\n\tPromixy chain: ${path}(${argList.length} args)`;
+                  Object.defineProperty(err, '__alreadyCatch', {value: true});
+                }
+                return Promise.reject(err);
               }
-              return Promise.reject(err);
             });
+
         }),
         `${path}(${argList.length} args)`
       ), handler);
@@ -79,7 +89,7 @@ function makePromixy(opts = {}) {
     }
   };
 
-  return val => new Proxy(setter(Promise.resolve(val), '{Promise}'), handler);
+  return val => new Proxy(setter(Promise.resolve(val), '{Promixy}'), handler);
 }
 
 /**
