@@ -62,7 +62,7 @@ function makePromixy(opts = {}) {
             throw new TypeError(`${path} is not function, got a ${typeof target}: ${target}`);
           
           //try use origin promise
-          argList = argList.map(a=> a.__promise || a);
+          argList = argList.map(a=> a && a.__promise || a);
 
           //try to calculate the promise value 
           return Promise.all(argList)
