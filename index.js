@@ -1,5 +1,5 @@
 "use strict";
-const setter         = (targetP, path)=> ()=>({targetP, path});
+const setter         = (targetP, path) => () => ({targetP, path});
 const defaultMethods = ['then', 'catch'];
 const originPromise  = Promise;
 
@@ -60,9 +60,9 @@ function makePromixy(opts = {}) {
         targetP.then(function (target) {
           if (target == null || typeof target !== 'function')
             throw new TypeError(`${path} is not function, got a ${typeof target}: ${target}`);
-          
+
           //try use origin promise
-          argList = argList.map(a=> a && a.__promise || a);
+          argList = argList.map(a => Promise.resolve(a && a.__promise || a).catch(e => e));
 
           //try to calculate the promise value 
           return Promise.all(argList)

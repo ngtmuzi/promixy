@@ -1,6 +1,6 @@
 {
   "name": "promixy",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A module help you make sync calling chain on Promise.",
   "main": "index.js",
   "engines": {
