@@ -1,7 +1,18 @@
 "use strict";
-const setter         = (targetP, path) => () => ({targetP, path});
 const defaultMethods = ['then', 'catch'];
 const originPromise  = Promise;
+
+/**
+ * return a getter function (only {Function} can be called by handle.apply())
+ * @param  {Promise}  target
+ * @param  {String}   path
+ * @return {Function} getter
+ */
+function setter(target, path) {
+  Object.defineProperty(target, '__chainPath', {value: path});
+
+  return () => target;
+}
 
 /**
  * @param opts {Object}
@@ -15,36 +26,40 @@ function makePromixy(opts = {}) {
 
   const handler = {
     get(getter, prop, receiver){
+      const targetP = getter();
+      const path    = Reflect.get(targetP, '__chainPath');
 
-      let {targetP, path} = getter();
-
+      if (prop === '__type') return 'promixy';
       if (prop === '__chainPath') return path;
       if (prop === '__promise') return targetP;
 
       //promise method
-      if (promiseMethods.includes(prop) && targetP[prop]) {
+      if (promiseMethods.includes(prop) && Reflect.has(targetP, prop)) {
         return new Proxy(setter(
-          Promise.resolve(targetP[prop].bind(targetP)),
-          `${path}.[Promise: ${prop}]`
+          Promise.resolve(Reflect.get(targetP, prop).bind(targetP)),
+          `${path}.[Promise: ${prop.toString()}]`,
+          targetP
         ), handler);
       }
 
-      //target property
+      //get target's property
       return new Proxy(setter(
         targetP.then(function (target) {
           if (target == null) throw new TypeError(`can't read property '${prop}' in ${path}, it got a ${target}`);
+          const value = Reflect.get(target, prop);
 
-          if (typeof target[prop] === 'function')
-            return target[prop].bind(target);
+          if (typeof value === 'function')
+            return value.bind(target);
           else
-            return target[prop];
+            return value;
         }),
-        `${path}.${prop}`
+        `${path}.${prop.toString()}`
       ), handler);
     },
 
     set(getter, prop, value, receiver){
-      let {targetP, path} = getter();
+      const targetP = getter();
+
       targetP.then(function (target) {
         Reflect.set(target, prop, value);
       });
@@ -53,7 +68,8 @@ function makePromixy(opts = {}) {
 
 
     apply(getter, thisArg, argList){
-      let {targetP, path} = getter();
+      const targetP    = getter();
+      const path       = Reflect.get(targetP, '__chainPath');
 
       //get function and run
       return new Proxy(setter(
@@ -64,7 +80,7 @@ function makePromixy(opts = {}) {
           //try use origin promise
           argList = argList.map(a => Promise.resolve(a && a.__promise || a).catch(e => e));
 
-          //try to calculate the promise value 
+          //try to calculate the promise value
           return Promise.all(argList)
             .then(function (argList) {
               try {

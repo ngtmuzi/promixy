@@ -3,7 +3,8 @@ A module help you make sync calling chain on Promise.
 Talk is cheap, show you the code.
 
 # Note
-This module only can run in Node 6.x because it use `Proxy`.
+This module only can be run after Node 6.x because it use `Proxy`.  
+And after Node 7.6 you can directly use `async/await` to make same things and better.   
 
 # Usage
 ## Get and Apply
