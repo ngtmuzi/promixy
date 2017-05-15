@@ -52,7 +52,8 @@ var _ = require('promixy').setDefault({
   Promise: require('bluebird')
 });
 ```
-##methods
+## methods
 If you use some module like `bluebird` that provide many method to Promise, you can choose what method can use on promixy.
-##Promise
+
+## Promise
 You can define what Promise Library that promixy use.
